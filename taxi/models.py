@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -11,17 +12,22 @@ class Driver(AbstractUser):
 
 class Car(models.Model):
     model = models.CharField(max_length=255)
-    manufacturer = models.OneToOneField(
-        "Manufacturer", unique=True, on_delete=models.CASCADE
+    manufacturer = models.ForeignKey(
+        "Manufacturer",
+        unique=True,
+        on_delete=models.CASCADE,
+        related_name="manufacturers"
     )
-    drivers = models.ManyToManyField(Driver)
+    drivers = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="cars"
+    )
 
     def __str__(self):
         return self.model
 
 
 class Manufacturer(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     country = models.CharField(max_length=255)
 
     def __str__(self):
